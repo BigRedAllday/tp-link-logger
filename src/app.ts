@@ -1,16 +1,22 @@
 import {Client} from "tplink-smarthome-api";
 import {AnyDevice} from "tplink-smarthome-api/lib/client";
+import fs from "fs";
 
 async function main() {
     const client = new Client();
-    client.getDevice({ host: '192.168.0.15' }).then((device: AnyDevice) => {
-        // device.getSysInfo().then(console.log);
-        device.setPowerState(true);
-        device.getInfo().then(console.log);
-        console.log(device.supportsEmeter);
+    fs.writeFileSync("log.txt", 'time;value\r\n');
+    client.getDevice({ host: '192.168.0.198' }).then((device: AnyDevice) => {
+
+        setInterval(() => {
+            device.getInfo().then((data) => {
+                const workaroundForStupids = JSON.parse(JSON.stringify(data));
+                const powerValue = workaroundForStupids["emeter"]["realtime"]["power"];
+                console.log(`Writing ${powerValue} to file log.txt`);
+                fs.appendFileSync("log.txt", `${new Date().toISOString()};${powerValue}\r\n`);
+            });
+        }, 1000);
     });
 }
-
 
 //Invoke the main function
 main().catch(err => {
