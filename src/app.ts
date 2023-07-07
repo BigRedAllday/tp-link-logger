@@ -8,7 +8,6 @@ async function main() {
         fs.writeFileSync("log.txt", 'time;value\r\n');
     }
     client.getDevice({ host: '192.168.0.198' }).then((device: AnyDevice) => {
-
         setInterval(() => {
             device.getInfo().then((data) => {
                 const workaroundForStupids = JSON.parse(JSON.stringify(data));
